@@ -29,7 +29,7 @@ const PORT = process.env.PORT || 5000;
 
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://localhost:5175", "https://trendy-jet.vercel.app"],
+    origin: ["http://localhost:5173", "http://localhost:5175", "https://bespoke-tailor.vercel.app"],
     methods: ["GET", "POST", "DELETE", "PUT"],
     allowedHeaders: [
       "Content-Type",
