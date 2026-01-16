@@ -12,6 +12,7 @@ import { Label } from "../ui/label";
 import StarRatingComponent from "../common/star-rating";
 import { useEffect, useState } from "react";
 import { addReview, getReviews } from "@/store/shop/review-slice";
+import { useNavigate } from "react-router-dom";
 
 function ProductDetailsDialog({ open, setOpen, productDetails }) {
   const [reviewMsg, setReviewMsg] = useState("");
@@ -23,6 +24,7 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
   const { reviews } = useSelector((state) => state.shopReview);
 
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   // Get images array (handle both old single image and new array format)
   const productImages = Array.isArray(productDetails?.image) 
@@ -38,6 +40,14 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
   }
 
   function handleAddToCart(getCurrentProductId, getTotalStock) {
+    if (!user) {
+      toast({
+        title: "Please login to add items to cart",
+        variant: "destructive",
+      });
+      navigate("/auth/login");
+      return;
+    }
     let getCartItems = cartItems.items || [];
 
     if (getCartItems.length) {
@@ -81,6 +91,14 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
   }
 
   function handleAddReview() {
+    if (!user) {
+      toast({
+        title: "Please login to write a review",
+        variant: "destructive",
+      });
+      navigate("/auth/login");
+      return;
+    }
     dispatch(
       addReview({
         productId: productDetails?._id,

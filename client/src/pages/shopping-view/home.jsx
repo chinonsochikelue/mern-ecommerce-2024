@@ -25,7 +25,7 @@ import { getFeatureImages } from "@/store/common-slice";
 
 const categoriesWithIcon = [
   { id: "business-suits", label: "Business Suits", image: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=400" },
-  { id: "wedding-suits", label: "Wedding Suits", image: "https://images.unsplash.com/photo-1605334099268-f5acc6e7c50f?w=400" },
+  { id: "wedding-suits", label: "Wedding Suits", image: "https://images.unsplash.com/photo-1522968439036-e6338d0ed84f?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" },
   { id: "tuxedos", label: "Tuxedos", image: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=400" },
   { id: "dress-shirts", label: "Dress Shirts", image: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=400" },
   { id: "accessories", label: "Accessories", image: "https://images.unsplash.com/photo-1588099768523-f4e6a5679d88?w=400" },
@@ -69,6 +69,14 @@ function ShoppingHome() {
   }
 
   function handleAddtoCart(getCurrentProductId) {
+    if (!user) {
+      toast({
+        title: "Please login to add items to cart",
+        variant: "destructive",
+      });
+      navigate("/auth/login");
+      return;
+    }
     dispatch(
       addToCart({
         userId: user?.id,
@@ -130,7 +138,7 @@ function ShoppingHome() {
         {/* Hero Content */}
         <div className="absolute inset-0 flex flex-col items-center justify-center text-white z-10 px-4">
           <h1 className="text-4xl md:text-6xl font-bold mb-4 text-center animate-in fade-in slide-in-from-bottom-4 duration-700" style={{fontFamily: 'Georgia, serif'}}>
-            Elegance Tailored to Perfection
+            Bespoke Mastery in Every Stitch
           </h1>
           <p className="text-lg md:text-xl mb-8 text-center max-w-2xl animate-in fade-in slide-in-from-bottom-4 duration-700 delay-150">
             Discover our exclusive collection of premium men's suits, handcrafted with the finest materials
@@ -229,7 +237,6 @@ function ShoppingHome() {
           </div>
         </div>
       </section>
-
       {/* Featured Products Section */}
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">

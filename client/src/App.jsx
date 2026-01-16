@@ -23,6 +23,7 @@ import PaypalReturnPage from "./pages/shopping-view/paypal-return";
 import PaymentSuccessPage from "./pages/shopping-view/payment-success";
 import SearchProducts from "./pages/shopping-view/search";
 import ProductDetailPage from "./pages/shopping-view/product-detail";
+import BespokeTailoring from "./pages/shopping-view/bespoke-tailoring";
 
 function App() {
   const { user, isAuthenticated, isLoading } = useSelector(
@@ -90,6 +91,7 @@ function App() {
           <Route path="payment-success" element={<PaymentSuccessPage />} />
           <Route path="search" element={<SearchProducts />} />
           <Route path="product/:id" element={<ProductDetailPage />} />
+          <Route path="bespoke" element={<BespokeTailoring />} />
         </Route>
         <Route path="/unauth-page" element={<UnauthPage />} />
         <Route path="*" element={<NotFound />} />

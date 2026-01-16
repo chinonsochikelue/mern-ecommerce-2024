@@ -142,6 +142,11 @@ export const shoppingViewHeaderMenuItems = [
     label: "Search",
     path: "/shop/search",
   },
+  {
+    id: "bespoke",
+    label: "Bespoke Tailoring",
+    path: "/shop/bespoke",
+  },
 ];
 
 export const categoryOptionsMap = {
