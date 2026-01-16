@@ -58,11 +58,11 @@ export const addProductFormElements = [
     name: "category",
     componentType: "select",
     options: [
-      { id: "men", label: "Men" },
-      { id: "women", label: "Women" },
-      { id: "kids", label: "Kids" },
+      { id: "business-suits", label: "Business Suits" },
+      { id: "wedding-suits", label: "Wedding Suits" },
+      { id: "tuxedos", label: "Tuxedos" },
+      { id: "dress-shirts", label: "Dress Shirts" },
       { id: "accessories", label: "Accessories" },
-      { id: "footwear", label: "Footwear" },
     ],
   },
   {
@@ -70,12 +70,12 @@ export const addProductFormElements = [
     name: "brand",
     componentType: "select",
     options: [
-      { id: "nike", label: "Nike" },
-      { id: "adidas", label: "Adidas" },
-      { id: "puma", label: "Puma" },
-      { id: "levi", label: "Levi's" },
-      { id: "zara", label: "Zara" },
-      { id: "h&m", label: "H&M" },
+      { id: "tom-ford", label: "Tom Ford" },
+      { id: "brioni", label: "Brioni" },
+      { id: "ermenegildo-zegna", label: "Ermenegildo Zegna" },
+      { id: "canali", label: "Canali" },
+      { id: "hugo-boss", label: "Hugo Boss" },
+      { id: "giorgio-armani", label: "Giorgio Armani" },
     ],
   },
   {
@@ -113,23 +113,23 @@ export const shoppingViewHeaderMenuItems = [
     path: "/shop/listing",
   },
   {
-    id: "men",
-    label: "Men",
+    id: "business-suits",
+    label: "Business Suits",
     path: "/shop/listing",
   },
   {
-    id: "women",
-    label: "Women",
+    id: "wedding-suits",
+    label: "Wedding Suits",
     path: "/shop/listing",
   },
   {
-    id: "kids",
-    label: "Kids",
+    id: "tuxedos",
+    label: "Tuxedos",
     path: "/shop/listing",
   },
   {
-    id: "footwear",
-    label: "Footwear",
+    id: "dress-shirts",
+    label: "Dress Shirts",
     path: "/shop/listing",
   },
   {
@@ -145,37 +145,38 @@ export const shoppingViewHeaderMenuItems = [
 ];
 
 export const categoryOptionsMap = {
-  men: "Men",
-  women: "Women",
-  kids: "Kids",
+  "business-suits": "Business Suits",
+  "wedding-suits": "Wedding Suits",
+  "tuxedos": "Tuxedos",
+  "dress-shirts": "Dress Shirts",
   accessories: "Accessories",
-  footwear: "Footwear",
 };
 
 export const brandOptionsMap = {
-  nike: "Nike",
-  adidas: "Adidas",
-  puma: "Puma",
-  levi: "Levi",
-  zara: "Zara",
+  "tom-ford": "Tom Ford",
+  "brioni": "Brioni",
+  "ermenegildo-zegna": "Ermenegildo Zegna",
+  "canali": "Canali",
+  "hugo-boss": "Hugo Boss",
+  "giorgio-armani": "Giorgio Armani",
   "h&m": "H&M",
 };
 
 export const filterOptions = {
   category: [
-    { id: "men", label: "Men" },
-    { id: "women", label: "Women" },
-    { id: "kids", label: "Kids" },
+    { id: "business-suits", label: "Business Suits" },
+    { id: "wedding-suits", label: "Wedding Suits" },
+    { id: "tuxedos", label: "Tuxedos" },
+    { id: "dress-shirts", label: "Dress Shirts" },
     { id: "accessories", label: "Accessories" },
-    { id: "footwear", label: "Footwear" },
   ],
   brand: [
-    { id: "nike", label: "Nike" },
-    { id: "adidas", label: "Adidas" },
-    { id: "puma", label: "Puma" },
-    { id: "levi", label: "Levi's" },
-    { id: "zara", label: "Zara" },
-    { id: "h&m", label: "H&M" },
+    { id: "tom-ford", label: "Tom Ford" },
+    { id: "brioni", label: "Brioni" },
+    { id: "ermenegildo-zegna", label: "Ermenegildo Zegna" },
+    { id: "canali", label: "Canali" },
+    { id: "hugo-boss", label: "Hugo Boss" },
+    { id: "giorgio-armani", label: "Giorgio Armani" },
   ],
 };
 

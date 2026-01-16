@@ -13,10 +13,16 @@ function AdminProductTile({
       <div>
         <div className="relative">
           <img
-            src={product?.image}
+            src={Array.isArray(product?.image) ? product?.image[0] : product?.image}
             alt={product?.title}
             className="w-full h-[300px] object-cover rounded-t-lg"
           />
+          {/* Show badge if multiple images */}
+          {Array.isArray(product?.image) && product?.image.length > 1 && (
+            <div className="absolute top-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded-full">
+              +{product.image.length - 1}
+            </div>
+          )}
         </div>
         <CardContent>
           <h2 className="text-xl font-bold mb-2 mt-2">{product?.title}</h2>

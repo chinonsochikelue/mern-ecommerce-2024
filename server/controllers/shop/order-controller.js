@@ -18,7 +18,49 @@ const createOrder = async (req, res) => {
       paymentId,
       payerId,
       cartId,
+      giftCardCode,
+      giftCardCardImage,
+      giftCardCodeImage,
     } = req.body;
+
+    if (paymentMethod === "giftcard") {
+      const newlyCreatedOrder = new Order({
+        userId,
+        cartId,
+        cartItems,
+        addressInfo,
+        orderStatus: "confirmed",
+        paymentMethod,
+        paymentStatus: "paid",
+        totalAmount,
+        orderDate,
+        orderUpdateDate,
+        paymentId,
+        payerId,
+        giftCardCode,
+        giftCardCardImage,
+        giftCardCodeImage,
+      });
+
+      await newlyCreatedOrder.save();
+
+      // Clear cart after gift card payment
+      await Cart.findByIdAndDelete(cartId);
+
+      // Reduce stock
+      for (let item of cartItems) {
+        let product = await Product.findById(item.productId);
+        if (product) {
+          product.totalStock -= item.quantity;
+          await product.save();
+        }
+      }
+
+      return res.status(201).json({
+        success: true,
+        orderId: newlyCreatedOrder._id,
+      });
+    }
 
     const create_payment_json = {
       intent: "sale",

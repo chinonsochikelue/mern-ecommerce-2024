@@ -20,7 +20,7 @@ import { Fragment, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 const initialFormData = {
-  image: null,
+  image: [], // Changed to array for multiple images
   title: "",
   description: "",
   category: "",
@@ -35,8 +35,8 @@ function AdminProducts() {
   const [openCreateProductsDialog, setOpenCreateProductsDialog] =
     useState(false);
   const [formData, setFormData] = useState(initialFormData);
-  const [imageFile, setImageFile] = useState(null);
-  const [uploadedImageUrl, setUploadedImageUrl] = useState("");
+  const [imageFiles, setImageFiles] = useState([]); // Changed to array
+  const [uploadedImageUrls, setUploadedImageUrls] = useState([]); // Changed to array
   const [imageLoadingState, setImageLoadingState] = useState(false);
   const [currentEditedId, setCurrentEditedId] = useState(null);
 
@@ -51,7 +51,10 @@ function AdminProducts() {
       ? dispatch(
           editProduct({
             id: currentEditedId,
-            formData,
+            formData: {
+              ...formData,
+              image: uploadedImageUrls, // Use array of URLs
+            },
           })
         ).then((data) => {
           console.log(data, "edit");
@@ -61,18 +64,21 @@ function AdminProducts() {
             setFormData(initialFormData);
             setOpenCreateProductsDialog(false);
             setCurrentEditedId(null);
+            setImageFiles([]);
+            setUploadedImageUrls([]);
           }
         })
       : dispatch(
           addNewProduct({
             ...formData,
-            image: uploadedImageUrl,
+            image: uploadedImageUrls, // Use array of URLs
           })
         ).then((data) => {
           if (data?.payload?.success) {
             dispatch(fetchAllProducts());
             setOpenCreateProductsDialog(false);
-            setImageFile(null);
+            setImageFiles([]);
+            setUploadedImageUrls([]);
             setFormData(initialFormData);
             toast({
               title: "Product add successfully",
@@ -90,15 +96,38 @@ function AdminProducts() {
   }
 
   function isFormValid() {
-    return Object.keys(formData)
-      .filter((currentKey) => currentKey !== "averageReview")
+    // Check if at least one image is uploaded
+    const hasImages = uploadedImageUrls && uploadedImageUrls.length > 0;
+    
+    // Check all other form fields
+    const otherFieldsValid = Object.keys(formData)
+      .filter((currentKey) => currentKey !== "averageReview" && currentKey !== "image")
       .map((key) => formData[key] !== "")
       .every((item) => item);
+      
+    return hasImages && otherFieldsValid;
   }
 
   useEffect(() => {
     dispatch(fetchAllProducts());
   }, [dispatch]);
+
+  // Handle edit mode - load existing product images
+  useEffect(() => {
+    if (currentEditedId !== null && formData.image) {
+      // Convert image to array if needed (backward compatibility)
+      const existingImages = Array.isArray(formData.image) 
+        ? formData.image 
+        : [formData.image];
+      
+      setUploadedImageUrls(existingImages);
+      // Create dummy file objects for display purposes
+      const dummyFiles = existingImages.map((url, index) => {
+        return new File([], `existing-image-${index}.jpg`, { type: 'image/jpeg' });
+      });
+      setImageFiles(dummyFiles);
+    }
+  }, [currentEditedId, formData.image]);
 
   console.log(formData, "productList");
 
@@ -128,6 +157,8 @@ function AdminProducts() {
           setOpenCreateProductsDialog(false);
           setCurrentEditedId(null);
           setFormData(initialFormData);
+          setImageFiles([]);
+          setUploadedImageUrls([]);
         }}
       >
         <SheetContent side="right" className="overflow-auto">
@@ -137,10 +168,10 @@ function AdminProducts() {
             </SheetTitle>
           </SheetHeader>
           <ProductImageUpload
-            imageFile={imageFile}
-            setImageFile={setImageFile}
-            uploadedImageUrl={uploadedImageUrl}
-            setUploadedImageUrl={setUploadedImageUrl}
+            imageFiles={imageFiles}
+            setImageFiles={setImageFiles}
+            uploadedImageUrls={uploadedImageUrls}
+            setUploadedImageUrls={setUploadedImageUrls}
             setImageLoadingState={setImageLoadingState}
             imageLoadingState={imageLoadingState}
             isEditMode={currentEditedId !== null}

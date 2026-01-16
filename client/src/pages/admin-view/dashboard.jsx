@@ -5,20 +5,27 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 function AdminDashboard() {
-  const [imageFile, setImageFile] = useState(null);
-  const [uploadedImageUrl, setUploadedImageUrl] = useState("");
+  const [imageFiles, setImageFiles] = useState([]);
+  const [uploadedImageUrls, setUploadedImageUrls] = useState([]);
   const [imageLoadingState, setImageLoadingState] = useState(false);
   const dispatch = useDispatch();
   const { featureImageList } = useSelector((state) => state.commonFeature);
 
-  console.log(uploadedImageUrl, "uploadedImageUrl");
+  console.log(uploadedImageUrls, "uploadedImageUrls");
 
   function handleUploadFeatureImage() {
-    dispatch(addFeatureImage(uploadedImageUrl)).then((data) => {
+    // Upload the first image URL from the array
+    const imageUrl = uploadedImageUrls[0];
+    if (!imageUrl) {
+      alert("Please upload an image first");
+      return;
+    }
+    
+    dispatch(addFeatureImage(imageUrl)).then((data) => {
       if (data?.payload?.success) {
         dispatch(getFeatureImages());
-        setImageFile(null);
-        setUploadedImageUrl("");
+        setImageFiles([]);
+        setUploadedImageUrls([]);
       }
     });
   }
@@ -32,10 +39,10 @@ function AdminDashboard() {
   return (
     <div>
       <ProductImageUpload
-        imageFile={imageFile}
-        setImageFile={setImageFile}
-        uploadedImageUrl={uploadedImageUrl}
-        setUploadedImageUrl={setUploadedImageUrl}
+        imageFiles={imageFiles}
+        setImageFiles={setImageFiles}
+        uploadedImageUrls={uploadedImageUrls}
+        setUploadedImageUrls={setUploadedImageUrls}
         setImageLoadingState={setImageLoadingState}
         imageLoadingState={imageLoadingState}
         isCustomStyling={true}

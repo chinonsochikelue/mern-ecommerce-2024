@@ -35,10 +35,20 @@ const addProduct = async (req, res) => {
       averageReview,
     } = req.body;
 
+    // Ensure image is an array (backward compatibility)
+    const imageArray = Array.isArray(image) ? image : image ? [image] : [];
+
+    if (imageArray.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "At least one product image is required",
+      });
+    }
+
     console.log(averageReview, "averageReview");
 
     const newlyCreatedProduct = new Product({
-      image,
+      image: imageArray,
       title,
       description,
       category,
@@ -112,7 +122,15 @@ const editProduct = async (req, res) => {
     findProduct.salePrice =
       salePrice === "" ? 0 : salePrice || findProduct.salePrice;
     findProduct.totalStock = totalStock || findProduct.totalStock;
-    findProduct.image = image || findProduct.image;
+
+    // Handle image updates - ensure it's always an array
+    if (image !== undefined) {
+      const imageArray = Array.isArray(image) ? image : image ? [image] : [];
+      if (imageArray.length > 0) {
+        findProduct.image = imageArray;
+      }
+    }
+
     findProduct.averageReview = averageReview || findProduct.averageReview;
 
     await findProduct.save();

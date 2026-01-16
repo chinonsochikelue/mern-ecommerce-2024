@@ -16,12 +16,20 @@ import { addReview, getReviews } from "@/store/shop/review-slice";
 function ProductDetailsDialog({ open, setOpen, productDetails }) {
   const [reviewMsg, setReviewMsg] = useState("");
   const [rating, setRating] = useState(0);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
   const { cartItems } = useSelector((state) => state.shopCart);
   const { reviews } = useSelector((state) => state.shopReview);
 
   const { toast } = useToast();
+
+  // Get images array (handle both old single image and new array format)
+  const productImages = Array.isArray(productDetails?.image) 
+    ? productDetails?.image 
+    : productDetails?.image 
+    ? [productDetails?.image] 
+    : [];
 
   function handleRatingChange(getRating) {
     console.log(getRating, "getRating");
@@ -69,6 +77,7 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
     dispatch(setProductDetails());
     setRating(0);
     setReviewMsg("");
+    setSelectedImageIndex(0);
   }
 
   function handleAddReview() {
@@ -108,13 +117,33 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
     <Dialog open={open} onOpenChange={handleDialogClose}>
       <DialogContent className="grid grid-cols-2 gap-8 sm:p-12 max-w-[90vw] sm:max-w-[80vw] lg:max-w-[70vw]">
         <div className="relative overflow-hidden rounded-lg">
+          {/* Main Image Display */}
           <img
-            src={productDetails?.image}
+            src={productImages[selectedImageIndex]}
             alt={productDetails?.title}
             width={600}
             height={600}
             className="aspect-square w-full object-cover"
           />
+          
+          {/* Thumbnail Navigation */}
+          {productImages.length > 1 && (
+            <div className="flex gap-2 mt-4 overflow-x-auto">
+              {productImages.map((image, index) => (
+                <img
+                  key={index}
+                  src={image}
+                  alt={`${productDetails?.title} ${index + 1}`}
+                  className={`w-20 h-20 object-cover rounded cursor-pointer border-2 ${
+                    selectedImageIndex === index 
+                      ? "border-primary" 
+                      : "border-transparent hover:border-gray-300"
+                  }`}
+                  onClick={() => setSelectedImageIndex(index)}
+                />
+              ))}
+            </div>
+          )}
         </div>
         <div className="">
           <div>
