@@ -16,7 +16,7 @@ function ShoppingProductTile({
       <div onClick={() => navigate(`/shop/product/${product?._id}`)} className="cursor-pointer">
         <div className="relative overflow-hidden">
           <img
-            src={product?.image[0]}
+            src={Array.isArray(product?.image) ? product?.image[0] : product?.image}
             alt={product?.title}
             className="w-full h-[300px] object-cover rounded-t-lg group-hover:scale-110 transition-transform duration-500"
           />

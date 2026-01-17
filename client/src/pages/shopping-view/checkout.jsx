@@ -9,8 +9,7 @@ import { Navigate, useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import CommonImageUpload from "@/components/common/image-upload";
-import { CreditCard, Wallet } from "lucide-react";
+import { Mail, ShieldCheck } from "lucide-react";
 import { Label } from "@/components/ui/label";
 
 function ShoppingCheckout() {
@@ -19,14 +18,6 @@ function ShoppingCheckout() {
   const { approvalURL } = useSelector((state) => state.shopOrder);
   const [currentSelectedAddress, setCurrentSelectedAddress] = useState(null);
   const [isPaymentStart, setIsPaymemntStart] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState("paypal");
-  const [giftCardCode, setGiftCardCode] = useState("");
-  const [giftCardFile, setGiftCardFile] = useState(null);
-  const [giftCardImageUrl, setGiftCardImageUrl] = useState("");
-  const [giftCardImageLoading, setGiftCardImageLoading] = useState(false);
-  const [giftCardCodeFile, setGiftCardCodeFile] = useState(null);
-  const [giftCardCodeImageUrl, setGiftCardCodeImageUrl] = useState("");
-  const [giftCardCodeImageLoading, setGiftCardCodeImageLoading] = useState(false);
   
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -48,11 +39,13 @@ function ShoppingCheckout() {
       : 0;
 
   function handleCheckout() {
+    setIsPaymemntStart(true);
     if (cartItems.length === 0) {
       toast({
         title: "Your cart is empty. Please add items to proceed",
         variant: "destructive",
       });
+      setIsPaymemntStart(false);
       return;
     }
     if (currentSelectedAddress === null) {
@@ -60,19 +53,10 @@ function ShoppingCheckout() {
         title: "Please select one address to proceed.",
         variant: "destructive",
       });
+      setIsPaymemntStart(false);
       return;
     }
 
-    if (paymentMethod === "giftcard") {
-      if (!giftCardCode) {
-        toast({ title: "Please enter your gift card code.", variant: "destructive" });
-        return;
-      }
-      if (!giftCardImageUrl || !giftCardCodeImageUrl) {
-        toast({ title: "Please upload both the gift card image and the code image.", variant: "destructive" });
-        return;
-      }
-    }
 
     const orderData = {
       userId: user?.id,
@@ -95,29 +79,45 @@ function ShoppingCheckout() {
         phone: currentSelectedAddress?.phone,
         notes: currentSelectedAddress?.notes,
       },
-      orderStatus: paymentMethod === "giftcard" ? "confirmed" : "pending",
-      paymentMethod: paymentMethod,
-      paymentStatus: paymentMethod === "giftcard" ? "paid" : "pending",
+      orderStatus: "Email Consultation",
+      paymentMethod: "email",
+      paymentStatus: "pending",
       totalAmount: totalCartAmount,
       orderDate: new Date(),
       orderUpdateDate: new Date(),
       paymentId: "",
       payerId: "",
-      giftCardCode: paymentMethod === "giftcard" ? giftCardCode : "",
-      giftCardCardImage: paymentMethod === "giftcard" ? giftCardImageUrl : "",
-      giftCardCodeImage: paymentMethod === "giftcard" ? giftCardCodeImageUrl : "",
     };
 
     dispatch(createNewOrder(orderData)).then((data) => {
       if (data?.payload?.success) {
-        if (paymentMethod === "giftcard") {
-          toast({ title: "Order placed successfully with gift card!" });
-          navigate("/shop/payment-success");
-        } else {
-          setIsPaymemntStart(true);
-        }
+        const orderId = data.payload.orderId || "Pending";
+        
+        // Construct detailed email template
+        const emailSubject = encodeURIComponent(`Bespoke Consultation Request - Order #${orderId}`);
+        const itemsList = cartItems.items.map((item, index) => 
+          `${index + 1}. ${item.title} (Qty: ${item.quantity}) - $${item.salePrice > 0 ? item.salePrice : item.price}`
+        ).join('%0D%0A');
+
+        const emailBody = encodeURIComponent(
+          `Hello Bespoke Tailors,%0D%0A%0D%0AI would like to request a consultation for the following items:%0D%0A%0D%0A--- Order Details ---%0D%0AOrder ID: ${orderId}%0D%0ACustomer: ${user?.userName}%0D%0APhone: ${currentSelectedAddress?.phone}%0D%0A%0D%0A--- Items ---%0D%0A${itemsList}%0D%0A%0D%0A--- Final Amount ---%0D%0ATotal: $${totalCartAmount}%0D%0A%0D%0A--- Shipping Address ---%0D%0A${currentSelectedAddress?.address}%0D%0A${currentSelectedAddress?.city}, ${currentSelectedAddress?.pincode}%0D%0A%0D%0AAdditional Notes: ${currentSelectedAddress?.notes || 'None'}%0D%0A%0D%0AThank you.%0D%0A`
+        );
+
+        const mailtoUrl = `mailto:bespoketailors@gmail.com?subject=${emailSubject}&body=${emailBody}`;
+        
+        toast({
+          title: "Order Saved!",
+          description: "Redirecting to email for consultation details...",
+        });
+
+        window.location.href = mailtoUrl;
+        setIsPaymemntStart(false);
       } else {
         setIsPaymemntStart(false);
+        toast({
+          title: "Error creating order",
+          variant: "destructive"
+        });
       }
     });
   }
@@ -139,7 +139,7 @@ function ShoppingCheckout() {
         <div className="flex flex-col gap-4">
           {cartItems && cartItems.items && cartItems.items.length > 0
             ? cartItems.items.map((item) => (
-                <UserCartItemsContent cartItem={item} />
+                <UserCartItemsContent key={item.productId} cartItem={item} />
               ))
             : null}
           <div className="mt-8 space-y-4">
@@ -148,59 +148,28 @@ function ShoppingCheckout() {
               <span className="font-bold">${totalCartAmount}</span>
             </div>
           </div>
-          <div className="mt-6">
-            <h3 className="text-lg font-semibold mb-3">Select Payment Method</h3>
-            <Tabs value={paymentMethod} onValueChange={setPaymentMethod} className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="paypal" className="flex items-center gap-2">
-                  <Wallet className="w-4 h-4" /> PayPal
-                </TabsTrigger>
-                <TabsTrigger value="giftcard" className="flex items-center gap-2">
-                  <CreditCard className="w-4 h-4" /> Gift Card
-                </TabsTrigger>
-              </TabsList>
-              <TabsContent value="paypal" className="mt-4">
-                <p className="text-sm text-muted-foreground mb-4">You will be redirected to PayPal to complete your purchase securely.</p>
-              </TabsContent>
-              <TabsContent value="giftcard" className="mt-4 space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="giftCardCode">Gift Card Code</Label>
-                  <Input 
-                    id="giftCardCode" 
-                    placeholder="Enter your gift card code" 
-                    value={giftCardCode} 
-                    onChange={(e) => setGiftCardCode(e.target.value)}
-                  />
-                </div>
-                <div className="grid grid-cols-1 gap-4">
-                  <CommonImageUpload 
-                    label="Upload Gift Card Image"
-                    imageFile={giftCardFile}
-                    setImageFile={setGiftCardFile}
-                    uploadedImageUrl={giftCardImageUrl}
-                    setUploadedImageUrl={setGiftCardImageUrl}
-                    imageLoadingState={giftCardImageLoading}
-                    setImageLoadingState={setGiftCardImageLoading}
-                  />
-                  <CommonImageUpload 
-                    label="Upload Gift Card Code Image"
-                    imageFile={giftCardCodeFile}
-                    setImageFile={setGiftCardCodeFile}
-                    uploadedImageUrl={giftCardCodeImageUrl}
-                    setUploadedImageUrl={setGiftCardCodeImageUrl}
-                    imageLoadingState={giftCardCodeImageLoading}
-                    setImageLoadingState={setGiftCardCodeImageLoading}
-                  />
-                </div>
-              </TabsContent>
-            </Tabs>
-          </div>
-          <div className="mt-4 w-full">
-            <Button onClick={handleCheckout} className="w-full" disabled={isPaymentStart || giftCardImageLoading || giftCardCodeImageLoading}>
-              {isPaymentStart
-                ? "Processing..."
-                : paymentMethod === "paypal" ? "Checkout with Paypal" : "Place Order with Gift Card"}
-            </Button>
+          <div className="mt-8 bg-gray-50 border border-gray-100 rounded-2xl p-6">
+            <h3 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ fontFamily: "Georgia, serif" }}>
+              <Mail className="w-5 h-5 text-yellow-600" />
+              Bespoke Consultation
+            </h3>
+            <p className="text-sm text-gray-600 mb-6 leading-relaxed">
+              To maintain our commitment to mastery and precision, all final selections go through a personalized consultation. 
+              Clicking below will save your order and open your email to coordinate with our master tailors.
+            </p>
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 text-green-600 text-sm font-semibold">
+                <ShieldCheck className="w-4 h-4" />
+                Verified Bespoke Protocol
+              </div>
+              <Button 
+                onClick={handleCheckout} 
+                className="w-full bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-7 rounded-lg shadow-xl hover:shadow-yellow-600/20 transition-all text-lg" 
+                disabled={isPaymentStart}
+              >
+                {isPaymentStart ? "Saving Order..." : "Proceed to Consultation"}
+              </Button>
+            </div>
           </div>
         </div>
       </div>

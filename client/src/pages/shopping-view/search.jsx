@@ -1,6 +1,7 @@
 import ProductDetailsDialog from "@/components/shopping-view/product-details";
 import ShoppingProductTile from "@/components/shopping-view/product-tile";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/use-toast";
 import { addToCart, fetchCartItems } from "@/store/shop/cart-slice";
 import { fetchProductDetails } from "@/store/shop/products-slice";
@@ -17,7 +18,7 @@ function SearchProducts() {
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const dispatch = useDispatch();
-  const { searchResults } = useSelector((state) => state.shopSearch);
+  const { searchResults, isLoading } = useSelector((state) => state.shopSearch);
   const { productDetails } = useSelector((state) => state.shopProducts);
 
   const { user } = useSelector((state) => state.auth);
@@ -97,17 +98,28 @@ function SearchProducts() {
           />
         </div>
       </div>
-      {!searchResults.length ? (
-        <h1 className="text-5xl font-extrabold">No result found!</h1>
-      ) : null}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-        {searchResults.map((item) => (
-          <ShoppingProductTile
-            handleAddtoCart={handleAddtoCart}
-            product={item}
-            handleGetProductDetails={handleGetProductDetails}
-          />
-        ))}
+        {isLoading ? (
+          [1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+            <div key={i} className="flex flex-col space-y-3">
+              <Skeleton className="h-[300px] w-full rounded-xl" />
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-[80%]" />
+              </div>
+            </div>
+          ))
+        ) : searchResults.length ? (
+          searchResults.map((item) => (
+            <ShoppingProductTile
+              handleAddtoCart={handleAddtoCart}
+              product={item}
+              handleGetProductDetails={handleGetProductDetails}
+            />
+          ))
+        ) : keyword.trim().length > 3 ? (
+          <h1 className="text-2xl font-bold">No result found!</h1>
+        ) : null}
       </div>
       <ProductDetailsDialog
         open={openDetailsDialog}

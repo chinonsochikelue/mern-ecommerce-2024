@@ -2,8 +2,9 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
 import { SheetContent, SheetHeader, SheetTitle } from "../ui/sheet";
 import UserCartItemsContent from "./cart-items-content";
+import { Skeleton } from "../ui/skeleton";
 
-function UserCartWrapper({ cartItems, setOpenCartSheet }) {
+function UserCartWrapper({ cartItems, setOpenCartSheet, isLoading }) {
   const navigate = useNavigate();
 
   const totalCartAmount =
@@ -24,9 +25,19 @@ function UserCartWrapper({ cartItems, setOpenCartSheet }) {
       <SheetHeader>
         <SheetTitle>Your Cart</SheetTitle>
       </SheetHeader>
-      <div className="mt-8 space-y-4">
-        {cartItems && cartItems.length > 0
-          ? cartItems.map((item) => <UserCartItemsContent cartItem={item} />)
+      <div className="mt-8 space-y-4 max-h-[400px] overflow-y-auto pr-2">
+        {isLoading ? (
+          [1, 2, 3].map((i) => (
+            <div key={i} className="flex items-center space-x-4">
+              <Skeleton className="h-16 w-16 rounded" />
+              <div className="flex-1 space-y-2">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-[60%]" />
+              </div>
+            </div>
+          ))
+        ) : cartItems && cartItems.length > 0
+          ? cartItems.map((item) => <UserCartItemsContent key={item.productId} cartItem={item} />)
           : null}
       </div>
       <div className="mt-8 space-y-4">

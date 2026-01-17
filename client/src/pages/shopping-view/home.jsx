@@ -14,6 +14,7 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   fetchAllFilteredProducts,
 } from "@/store/shop/products-slice";
@@ -41,7 +42,7 @@ const brandsWithIcon = [
 ];
 function ShoppingHome() {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const { productList } = useSelector(
+  const { productList, isLoading } = useSelector(
     (state) => state.shopProducts
   );
   const { featureImageList } = useSelector((state) => state.commonFeature);
@@ -244,15 +245,25 @@ function ShoppingHome() {
             Signature Collection
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {productList && productList.length > 0
-              ? productList.map((productItem) => (
-                  <ShoppingProductTile
-                    handleGetProductDetails={handleGetProductDetails}
-                    product={productItem}
-                    handleAddtoCart={handleAddtoCart}
-                  />
-                ))
-              : null}
+            {isLoading ? (
+              [1, 2, 3, 4].map((i) => (
+                <div key={i} className="flex flex-col space-y-3">
+                  <Skeleton className="h-[300px] w-full rounded-xl" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-[250px]" />
+                    <Skeleton className="h-4 w-[200px]" />
+                  </div>
+                </div>
+              ))
+            ) : productList && productList.length > 0 ? (
+              productList.map((productItem) => (
+                <ShoppingProductTile
+                  handleGetProductDetails={handleGetProductDetails}
+                  product={productItem}
+                  handleAddtoCart={handleAddtoCart}
+                />
+              ))
+            ) : null}
           </div>
         </div>
       </section>

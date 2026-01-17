@@ -4,6 +4,7 @@ import { Button } from "../ui/button";
 import { Dialog, DialogContent } from "../ui/dialog";
 import { Separator } from "../ui/separator";
 import { Input } from "../ui/input";
+import { Skeleton } from "../ui/skeleton";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart, fetchCartItems } from "@/store/shop/cart-slice";
 import { useToast } from "../ui/use-toast";
@@ -21,7 +22,7 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
   const { cartItems } = useSelector((state) => state.shopCart);
-  const { reviews } = useSelector((state) => state.shopReview);
+  const { reviews, isLoading: isReviewsLoading } = useSelector((state) => state.shopReview);
 
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -215,7 +216,17 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
           <div className="max-h-[300px] overflow-auto">
             <h2 className="text-xl font-bold mb-4">Reviews</h2>
             <div className="grid gap-6">
-              {reviews && reviews.length > 0 ? (
+              {isReviewsLoading ? (
+                [1, 2, 3].map((i) => (
+                  <div key={i} className="flex gap-4">
+                    <Skeleton className="w-10 h-10 rounded-full" />
+                    <div className="grid gap-1 flex-1">
+                      <Skeleton className="h-4 w-[100px]" />
+                      <Skeleton className="h-4 w-full" />
+                    </div>
+                  </div>
+                ))
+              ) : reviews && reviews.length > 0 ? (
                 reviews.map((reviewItem) => (
                   <div className="flex gap-4">
                     <Avatar className="w-10 h-10 border">

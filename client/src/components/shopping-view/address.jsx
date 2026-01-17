@@ -11,6 +11,7 @@ import {
 } from "@/store/shop/address-slice";
 import AddressCard from "./address-card";
 import { useToast } from "../ui/use-toast";
+import { Skeleton } from "../ui/skeleton";
 
 const initialAddressFormData = {
   address: "",
@@ -25,7 +26,7 @@ function Address({ setCurrentSelectedAddress, selectedId }) {
   const [currentEditedId, setCurrentEditedId] = useState(null);
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
-  const { addressList } = useSelector((state) => state.shopAddress);
+  const { addressList, isLoading } = useSelector((state) => state.shopAddress);
   const { toast } = useToast();
 
   function handleManageAddress(event) {
@@ -114,17 +115,22 @@ function Address({ setCurrentSelectedAddress, selectedId }) {
   return (
     <Card>
       <div className="mb-5 p-3 grid grid-cols-1 sm:grid-cols-2  gap-2">
-        {addressList && addressList.length > 0
-          ? addressList.map((singleAddressItem) => (
-              <AddressCard
-                selectedId={selectedId}
-                handleDeleteAddress={handleDeleteAddress}
-                addressInfo={singleAddressItem}
-                handleEditAddress={handleEditAddress}
-                setCurrentSelectedAddress={setCurrentSelectedAddress}
-              />
-            ))
-          : null}
+        {isLoading ? (
+          [1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-[150px] w-full rounded-lg" />
+          ))
+        ) : addressList && addressList.length > 0 ? (
+          addressList.map((singleAddressItem) => (
+            <AddressCard
+              key={singleAddressItem?._id}
+              selectedId={selectedId}
+              handleDeleteAddress={handleDeleteAddress}
+              addressInfo={singleAddressItem}
+              handleEditAddress={handleEditAddress}
+              setCurrentSelectedAddress={setCurrentSelectedAddress}
+            />
+          ))
+        ) : null}
       </div>
       <CardHeader>
         <CardTitle>

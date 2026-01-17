@@ -67,7 +67,7 @@ function MenuItems() {
 
 function HeaderRightContent({ isAuthenticated, user }) {
   // const { user } = useSelector((state) => state.auth);
-  const { cartItems } = useSelector((state) => state.shopCart);
+  const { cartItems, isLoading } = useSelector((state) => state.shopCart);
   const [openCartSheet, setOpenCartSheet] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -109,6 +109,7 @@ function HeaderRightContent({ isAuthenticated, user }) {
         </Button>
         <UserCartWrapper
           setOpenCartSheet={setOpenCartSheet}
+          isLoading={isLoading}
           cartItems={
             cartItems && cartItems.items && cartItems.items.length > 0
               ? cartItems.items

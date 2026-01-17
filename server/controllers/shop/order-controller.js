@@ -60,6 +60,40 @@ const createOrder = async (req, res) => {
         success: true,
         orderId: newlyCreatedOrder._id,
       });
+    } else if (paymentMethod === "email") {
+      const newlyCreatedOrder = new Order({
+        userId,
+        cartId,
+        cartItems,
+        addressInfo,
+        orderStatus,
+        paymentMethod,
+        paymentStatus,
+        totalAmount,
+        orderDate,
+        orderUpdateDate,
+        paymentId,
+        payerId,
+      });
+
+      await newlyCreatedOrder.save();
+
+      // Clear cart
+      await Cart.findByIdAndDelete(cartId);
+
+      // Reduce stock
+      for (let item of cartItems) {
+        let product = await Product.findById(item.productId);
+        if (product) {
+          product.totalStock -= item.quantity;
+          await product.save();
+        }
+      }
+
+      return res.status(201).json({
+        success: true,
+        orderId: newlyCreatedOrder._id,
+      });
     }
 
     const create_payment_json = {

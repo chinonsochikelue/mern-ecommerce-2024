@@ -2,6 +2,7 @@ import ProductFilter from "@/components/shopping-view/filter";
 import ProductDetailsDialog from "@/components/shopping-view/product-details";
 import ShoppingProductTile from "@/components/shopping-view/product-tile";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -40,7 +41,7 @@ function createSearchParamsHelper(filterParams) {
 function ShoppingListing() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { productList, productDetails } = useSelector(
+  const { productList, productDetails, isLoading } = useSelector(
     (state) => state.shopProducts
   );
   const { cartItems } = useSelector((state) => state.shopCart);
@@ -191,15 +192,25 @@ function ShoppingListing() {
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
-          {productList && productList.length > 0
-            ? productList.map((productItem) => (
-                <ShoppingProductTile
-                  handleGetProductDetails={handleGetProductDetails}
-                  product={productItem}
-                  handleAddtoCart={handleAddtoCart}
-                />
-              ))
-            : null}
+          {isLoading ? (
+            [1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+              <div key={i} className="flex flex-col space-y-3">
+                <Skeleton className="h-[300px] w-full rounded-xl" />
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-[80%]" />
+                </div>
+              </div>
+            ))
+          ) : productList && productList.length > 0 ? (
+            productList.map((productItem) => (
+              <ShoppingProductTile
+                handleGetProductDetails={handleGetProductDetails}
+                product={productItem}
+                handleAddtoCart={handleAddtoCart}
+              />
+            ))
+          ) : null}
         </div>
       </div>
       <ProductDetailsDialog
