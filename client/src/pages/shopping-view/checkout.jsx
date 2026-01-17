@@ -100,7 +100,57 @@ function ShoppingCheckout() {
         ).join('%0D%0A%0D%0A');
 
         const emailBody = encodeURIComponent(
-          `Dear Bespoke Tailors Team,%0D%0A%0D%0AI am writing to request a consultation for a custom order. Please find the complete order details below:%0D%0A%0D%0A━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━%0D%0AORDER INFORMATION%0D%0A━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━%0D%0A%0D%0AOrder Reference: #${orderId}%0D%0ACustomer Name: ${user?.userName}%0D%0AContact Number: ${currentSelectedAddress?.phone}%0D%0AOrder Date: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}%0D%0A%0D%0A━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━%0D%0AORDER ITEMS%0D%0A━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━%0D%0A%0D%0A${itemsList}%0D%0A%0D%0A━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━%0D%0AORDER SUMMARY%0D%0A━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━%0D%0A%0D%0ATotal Amount: $${totalCartAmount}%0D%0A%0D%0A━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━%0D%0ASHIPPING ADDRESS%0D%0A━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━%0D%0A%0D%0A${currentSelectedAddress?.address}%0D%0A${currentSelectedAddress?.city}, ${currentSelectedAddress?.pincode}%0D%0A%0D%0A${currentSelectedAddress?.notes ? `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━%0D%0AADDITIONAL NOTES%0D%0A━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━%0D%0A%0D%0A${currentSelectedAddress.notes}%0D%0A%0D%0A` : ''}I look forward to discussing the customization details at your earliest convenience.%0D%0A%0D%0AThank you for your time and attention to this matter.%0D%0A%0D%0ABest regards,%0D%0A${user?.userName}`
+          `Dear Bespoke Tailors Team,
+
+I am writing to request a consultation for a custom order. Please find the complete order details below:
+
+================================
+ORDER INFORMATION
+================================
+
+Order Reference: #${orderId}
+Customer Name: ${user?.userName}
+Contact Number: ${currentSelectedAddress?.phone}
+Order Date: ${new Date().toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })}
+
+================================
+ORDER ITEMS
+================================
+
+${cartItems.items
+            .map(
+              (item, index) =>
+                `${index + 1}. ${item.title}\n   Quantity: ${item.quantity}\n   Unit Price: $${item.salePrice > 0 ? item.salePrice : item.price
+                }`
+            )
+            .join("\n\n")}
+
+================================
+ORDER SUMMARY
+================================
+
+Total Amount: $${totalCartAmount}
+
+================================
+SHIPPING ADDRESS
+================================
+
+${currentSelectedAddress?.address}
+${currentSelectedAddress?.city}, ${currentSelectedAddress?.pincode}
+
+${currentSelectedAddress?.notes
+            ? `================================\nADDITIONAL NOTES\n================================\n\n${currentSelectedAddress.notes}\n\n`
+            : ""
+          }I look forward to discussing the customization details at your earliest convenience.
+
+Thank you for your time and attention to this matter.
+
+Best regards,
+${user?.userName}`
         );
 
         const mailtoUrl = `mailto:bespoketailors@gmail.com?subject=${emailSubject}&body=${emailBody}`;
