@@ -18,7 +18,7 @@ function ShoppingCheckout() {
   const { approvalURL } = useSelector((state) => state.shopOrder);
   const [currentSelectedAddress, setCurrentSelectedAddress] = useState(null);
   const [isPaymentStart, setIsPaymemntStart] = useState(false);
-  
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -28,14 +28,14 @@ function ShoppingCheckout() {
   const totalCartAmount =
     cartItems && cartItems.items && cartItems.items.length > 0
       ? cartItems.items.reduce(
-          (sum, currentItem) =>
-            sum +
-            (currentItem?.salePrice > 0
-              ? currentItem?.salePrice
-              : currentItem?.price) *
-              currentItem?.quantity,
-          0
-        )
+        (sum, currentItem) =>
+          sum +
+          (currentItem?.salePrice > 0
+            ? currentItem?.salePrice
+            : currentItem?.price) *
+          currentItem?.quantity,
+        0
+      )
       : 0;
 
   function handleCheckout() {
@@ -92,22 +92,22 @@ function ShoppingCheckout() {
     dispatch(createNewOrder(orderData)).then((data) => {
       if (data?.payload?.success) {
         const orderId = data.payload.orderId || "Pending";
-        
-        // Construct detailed email template
+
+        // Construct professional email template
         const emailSubject = encodeURIComponent(`Bespoke Consultation Request - Order #${orderId}`);
-        const itemsList = cartItems.items.map((item, index) => 
-          `${index + 1}. ${item.title} (Qty: ${item.quantity}) - $${item.salePrice > 0 ? item.salePrice : item.price}`
-        ).join('%0D%0A');
+        const itemsList = cartItems.items.map((item, index) =>
+          `${index + 1}. ${item.title}%0D%0A   Quantity: ${item.quantity}%0D%0A   Unit Price: $${item.salePrice > 0 ? item.salePrice : item.price}`
+        ).join('%0D%0A%0D%0A');
 
         const emailBody = encodeURIComponent(
-          `Hello Bespoke Tailors,%0D%0A%0D%0AI would like to request a consultation for the following items:%0D%0A%0D%0A--- Order Details ---%0D%0AOrder ID: ${orderId}%0D%0ACustomer: ${user?.userName}%0D%0APhone: ${currentSelectedAddress?.phone}%0D%0A%0D%0A--- Items ---%0D%0A${itemsList}%0D%0A%0D%0A--- Final Amount ---%0D%0ATotal: $${totalCartAmount}%0D%0A%0D%0A--- Shipping Address ---%0D%0A${currentSelectedAddress?.address}%0D%0A${currentSelectedAddress?.city}, ${currentSelectedAddress?.pincode}%0D%0A%0D%0AAdditional Notes: ${currentSelectedAddress?.notes || 'None'}%0D%0A%0D%0AThank you.%0D%0A`
+          `Dear Bespoke Tailors Team,%0D%0A%0D%0AI am writing to request a consultation for a custom order. Please find the complete order details below:%0D%0A%0D%0A━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━%0D%0AORDER INFORMATION%0D%0A━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━%0D%0A%0D%0AOrder Reference: #${orderId}%0D%0ACustomer Name: ${user?.userName}%0D%0AContact Number: ${currentSelectedAddress?.phone}%0D%0AOrder Date: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}%0D%0A%0D%0A━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━%0D%0AORDER ITEMS%0D%0A━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━%0D%0A%0D%0A${itemsList}%0D%0A%0D%0A━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━%0D%0AORDER SUMMARY%0D%0A━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━%0D%0A%0D%0ATotal Amount: $${totalCartAmount}%0D%0A%0D%0A━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━%0D%0ASHIPPING ADDRESS%0D%0A━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━%0D%0A%0D%0A${currentSelectedAddress?.address}%0D%0A${currentSelectedAddress?.city}, ${currentSelectedAddress?.pincode}%0D%0A%0D%0A${currentSelectedAddress?.notes ? `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━%0D%0AADDITIONAL NOTES%0D%0A━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━%0D%0A%0D%0A${currentSelectedAddress.notes}%0D%0A%0D%0A` : ''}I look forward to discussing the customization details at your earliest convenience.%0D%0A%0D%0AThank you for your time and attention to this matter.%0D%0A%0D%0ABest regards,%0D%0A${user?.userName}`
         );
 
         const mailtoUrl = `mailto:bespoketailors@gmail.com?subject=${emailSubject}&body=${emailBody}`;
-        
+
         toast({
-          title: "Order Saved!",
-          description: "Redirecting to email for consultation details...",
+          title: "Order Saved Successfully",
+          description: "Opening email client for consultation request...",
         });
 
         window.location.href = mailtoUrl;
@@ -115,7 +115,8 @@ function ShoppingCheckout() {
       } else {
         setIsPaymemntStart(false);
         toast({
-          title: "Error creating order",
+          title: "Order Creation Failed",
+          description: "Unable to process your order. Please try again.",
           variant: "destructive"
         });
       }
@@ -139,8 +140,8 @@ function ShoppingCheckout() {
         <div className="flex flex-col gap-4">
           {cartItems && cartItems.items && cartItems.items.length > 0
             ? cartItems.items.map((item) => (
-                <UserCartItemsContent key={item.productId} cartItem={item} />
-              ))
+              <UserCartItemsContent key={item.productId} cartItem={item} />
+            ))
             : null}
           <div className="mt-8 space-y-4">
             <div className="flex justify-between">
@@ -154,7 +155,7 @@ function ShoppingCheckout() {
               Bespoke Consultation
             </h3>
             <p className="text-sm text-gray-600 mb-6 leading-relaxed">
-              To maintain our commitment to mastery and precision, all final selections go through a personalized consultation. 
+              To maintain our commitment to mastery and precision, all final selections go through a personalized consultation.
               Clicking below will save your order and open your email to coordinate with our master tailors.
             </p>
             <div className="space-y-4">
@@ -162,9 +163,9 @@ function ShoppingCheckout() {
                 <ShieldCheck className="w-4 h-4" />
                 Verified Bespoke Protocol
               </div>
-              <Button 
-                onClick={handleCheckout} 
-                className="w-full bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-7 rounded-lg shadow-xl hover:shadow-yellow-600/20 transition-all text-lg" 
+              <Button
+                onClick={handleCheckout}
+                className="w-full bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-7 rounded-lg shadow-xl hover:shadow-yellow-600/20 transition-all text-lg"
                 disabled={isPaymentStart}
               >
                 {isPaymentStart ? "Saving Order..." : "Proceed to Consultation"}
